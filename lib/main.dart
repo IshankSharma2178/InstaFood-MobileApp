@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:food_app/screen/UserScreen/homeScreen.dart';
 import 'package:food_app/screen/authScreen/logInScreen.dart';
+import 'package:food_app/screen/authScreen/signUpScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -22,11 +23,26 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'InstaFood',
-      initialRoute: uuid == null ? '/login' : '/home',
-      routes: {
-        '/login': (context) => logInScreen(),
-        '/home': (context) => homeScreen(),
+      initialRoute:  uuid == null ? '/login' : '/home' ,
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/login':
+            return MaterialPageRoute(
+              builder: (_) => const logInScreen(),
+            );
+          case '/signup':
+            return MaterialPageRoute(
+              builder: (_) => const SignUpPage(),
+            );
+          case '/home':
+            return MaterialPageRoute(
+              builder: (_) => const homeScreen(),
+            );
+          default:
+            return MaterialPageRoute(
+              builder: (_) => const logInScreen(),
+            );
+        }
       },
     );
   }
