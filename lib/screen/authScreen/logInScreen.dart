@@ -1,43 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:food_app/handlers/logInHandler.dart';
+import 'package:food_app/providers/laoding.dart';
 
-class logInScreen extends StatefulWidget {
+class logInScreen extends ConsumerWidget {
   const logInScreen({super.key});
 
   @override
-  State<logInScreen> createState() => _logInScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLoading = ref.watch(loadingProvider);
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
 
-class _logInScreenState extends State<logInScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+    Future<void> submitLogin() async {
+      if (formKey.currentState!.validate()) {
+        ref.read(loadingProvider.notifier).state = true;
 
-  bool _isLoading = false;
+        await handleLogin(
+          context: context,
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
-  Future<void> _submitLogin() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-
-      await handleLogin(
-        context: context,
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-
-      setState(() => _isLoading = false);
+        ref.read(loadingProvider.notifier).state = false;
+      }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -52,9 +48,8 @@ class _logInScreenState extends State<logInScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                // Email Field
                 TextFormField(
-                  controller: _emailController,
+                  controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: "Email",
@@ -67,9 +62,8 @@ class _logInScreenState extends State<logInScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Password Field
                 TextFormField(
-                  controller: _passwordController,
+                  controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Password",
@@ -83,7 +77,6 @@ class _logInScreenState extends State<logInScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // Login Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -94,8 +87,8 @@ class _logInScreenState extends State<logInScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: _isLoading ? null : _submitLogin,
-                    child: _isLoading
+                    onPressed: isLoading ? null : submitLogin,
+                    child: isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                       "Login",
@@ -103,10 +96,8 @@ class _logInScreenState extends State<logInScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 30),
 
-                // Sign Up Redirect
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

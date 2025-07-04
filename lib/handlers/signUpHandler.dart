@@ -5,10 +5,11 @@ import 'package:food_app/server/auth/signUp.dart';
 Future<void> handleSignup({
   required BuildContext context,
   required String email,
+  required String name,
   required String password,
 }) async {
   try {
-    await signup(email, password);
+    await signup(name ,email, password);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Account created successfully 🎉")),

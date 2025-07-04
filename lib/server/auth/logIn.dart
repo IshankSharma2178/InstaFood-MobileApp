@@ -9,7 +9,8 @@ login(String email, password) async {
     String userId = userCredential.user!.uid;
     String? userEmail = userCredential.user!.email;
 
-    storeData(userEmail!, userId);
+    await storeUserData(email: userEmail!, uuid: userId);
+
   } on FirebaseAuthException catch (e) {
     throw e;
   }
