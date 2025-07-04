@@ -20,8 +20,6 @@ Future<Restaurant?> getRestaurantData() async {
 
     if (restaurantSnapshot.exists) {
       Restaurant restaurant = Restaurant.fromFirestore(restaurantSnapshot);
-      print(restaurant);
-
       return restaurant;
     } else {
       print('Restaurant with ID $restaurantId does not exist.');
