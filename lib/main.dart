@@ -13,7 +13,6 @@ void main() async {
   await Firebase.initializeApp();
   runApp(ProviderScope(child: MyApp(uuid: uuid)));
 }
-
 class MyApp extends StatelessWidget {
   final String? uuid;
 
