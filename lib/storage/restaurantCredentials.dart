@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_restaurantIdKey, restaurantId);
-      print('SharedPrefsService: Saved restaurantId: $restaurantId');
     } catch (e) {
       print('SharedPrefsService: Error saving restaurantId: $e');
     }
@@ -16,7 +15,6 @@ import 'package:shared_preferences/shared_preferences.dart';
     try {
       final prefs = await SharedPreferences.getInstance();
       final id = prefs.getString(_restaurantIdKey);
-      print('SharedPrefsService: Retrieved restaurantId: $id');
       return id;
     } catch (e) {
       print('SharedPrefsService: Error getting restaurantId: $e');
@@ -28,7 +26,6 @@ import 'package:shared_preferences/shared_preferences.dart';
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_restaurantIdKey);
-      print('SharedPrefsService: Cleared restaurantId');
     } catch (e) {
       print('SharedPrefsService: Error clearing restaurantId: $e');
     }

@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:food_app/screen/UserScreen/homeScreen.dart';
+import 'package:food_app/screen/UserScreen/navigatorScreen.dart';
 import 'package:food_app/screen/authScreen/logInScreen.dart';
 import 'package:food_app/screen/authScreen/signUpScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute:  uuid == null ? '/login' : '/home' ,
+      initialRoute:   '/home' ,
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/login':
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
             );
           case '/home':
             return MaterialPageRoute(
-              builder: (_) => const homeScreen(),
+              builder: (_) => const MainNavigationScreen(),
             );
           default:
             return MaterialPageRoute(

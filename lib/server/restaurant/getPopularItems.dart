@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:food_app/models/popularItemsModel.dart'; // Import your model
+import 'package:food_app/models/FoodItemModel.dart';
 
-Future<Map<String, List<PopularFoodItem>>> fetchPopularItems(String restaurantId) async {
+Future<Map<String, List<FoodItem>>> fetchPopularItems(String restaurantId) async {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  Map<String, List<PopularFoodItem>> popularItems = {};
+  Map<String, List<FoodItem>> popularItems = {};
 
   try {
     final mostPopularSnapshot = await firestore
@@ -16,7 +16,7 @@ Future<Map<String, List<PopularFoodItem>>> fetchPopularItems(String restaurantId
       String categoryName = categoryDoc.id;
       List<dynamic> ids = categoryDoc.data()['ids'] ?? [];
 
-      List<PopularFoodItem> categoryItems = [];
+      List<FoodItem> categoryItems = [];
 
       for (final dynamic itemId in ids) {
         final itemDoc = await firestore
@@ -30,7 +30,7 @@ Future<Map<String, List<PopularFoodItem>>> fetchPopularItems(String restaurantId
           try {
             final itemData = itemDoc.data();
             if (itemData != null) {
-              final item = PopularFoodItem.fromMap(itemData);
+              final item = FoodItem.fromMap(itemData, id: itemDoc.id);
               categoryItems.add(item);
             }
           } catch (e) {

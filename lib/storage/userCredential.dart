@@ -19,6 +19,11 @@ Future<void> storeUserData({
   }
 }
 
+Future<String?> getUserId() async {
+final prefs = await SharedPreferences.getInstance();
+return prefs.getString(_userUUIDKey);
+}
+
 Future<void> clearAllUserData() async {
   try {
     final prefs = await SharedPreferences.getInstance();
