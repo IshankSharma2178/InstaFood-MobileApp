@@ -57,7 +57,7 @@ class _CartPageState extends State<CartPage> {
                 name: cartItem.name,
                 price: double.tryParse(cartItem.amount.replaceAll('₹', '')) ?? 0.0,
                 weight: '200g',
-                ratings: 4.2,
+                ratings: 4.5,
                 description: 'Delicious food item',
                 available: true,
                 images: [cartItem.image],

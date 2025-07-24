@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
   Future<void> saveRestaurantId(String restaurantId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_restaurantIdKey, restaurantId);
+      await prefs.setString(_restaurantIdKey, "XmDSE2XOT3VqUhJmoN8T");
     } catch (e) {
       print('SharedPrefsService: Error saving restaurantId: $e');
     }
