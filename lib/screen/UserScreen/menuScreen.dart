@@ -30,8 +30,8 @@ class MenuScreen extends ConsumerWidget {
               itemCount: categoryMap.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 10.0,
+                mainAxisSpacing: 10.0,
                 childAspectRatio: 0.9,
               ),
               itemBuilder: (context, index) {
@@ -47,12 +47,11 @@ class MenuScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  child: Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    color: Colors.white,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:food_app/models/FoodItemModel.dart';
 import 'package:food_app/server/restaurant/addToCart.dart';
 import 'package:food_app/server/user/orderItem.dart';
+import 'package:food_app/server/user/removeFromCart.dart';
 import 'package:food_app/storage/userCredential.dart';
 
 class FoodItemDetailScreen extends StatelessWidget {
@@ -121,7 +122,7 @@ class FoodItemDetailScreen extends StatelessWidget {
                         itemCategory: categoryName,
                         amount: '₹${item.price.toStringAsFixed(2)}',
                       );
-
+                      await removeItemFromCart(item.id);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Order placed successfully')),
                       );
