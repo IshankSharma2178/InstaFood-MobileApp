@@ -8,7 +8,7 @@ Future<Map<String, List<FoodItem>>> fetchPopularItems(String restaurantId) async
   try {
     final mostPopularSnapshot = await firestore
         .collection('restaurant')
-        .doc(restaurantId)
+        .doc("XmDSE2XOT3VqUhJmoN8T")
         .collection('mostPopular')
         .get();
 
@@ -21,7 +21,7 @@ Future<Map<String, List<FoodItem>>> fetchPopularItems(String restaurantId) async
       for (final dynamic itemId in ids) {
         final itemDoc = await firestore
             .collection('restaurant')
-            .doc(restaurantId)
+            .doc("XmDSE2XOT3VqUhJmoN8T")
             .collection(categoryName)
             .doc(itemId.toString())
             .get();

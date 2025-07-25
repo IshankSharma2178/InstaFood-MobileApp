@@ -25,7 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
   Future<void> clearRestaurantId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_restaurantIdKey);
+      await prefs.remove("XmDSE2XOT3VqUhJmoN8T");
     } catch (e) {
       print('SharedPrefsService: Error clearing restaurantId: $e');
     }

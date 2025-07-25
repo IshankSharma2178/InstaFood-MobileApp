@@ -19,7 +19,7 @@ Future<Restaurant?> getRestaurantData() async {
 
     DocumentSnapshot<Map<String, dynamic>> restaurantSnapshot = await FirebaseFirestore.instance
         .collection('restaurant')
-        .doc(restaurantId)
+        .doc("XmDSE2XOT3VqUhJmoN8T")
         .get();
   
     if (restaurantSnapshot.exists) {

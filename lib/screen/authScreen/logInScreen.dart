@@ -28,48 +28,66 @@ class logInScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFFF1F6),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
           child: Form(
             key: formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const SizedBox(height: 30),
+                const Text(
+                  "FoodGo ",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFE91E63),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 const Text(
                   "Welcome Back!",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   "Login to your account",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
                 const SizedBox(height: 40),
 
+                // Email field
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: "Email",
+                    prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   validator: (value) =>
                   value == null || value.isEmpty ? 'Enter your email' : null,
                 ),
                 const SizedBox(height: 20),
 
+                // Password field
                 TextFormField(
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Password",
+                    prefixIcon: const Icon(Icons.lock_outline),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   validator: (value) => value == null || value.length < 6
                       ? 'Password must be at least 6 characters'
@@ -77,11 +95,12 @@ class logInScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 30),
 
+                // Login button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: const Color(0xFFE91E63),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -89,15 +108,24 @@ class logInScreen extends ConsumerWidget {
                     ),
                     onPressed: isLoading ? null : submitLogin,
                     child: isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
                         : const Text(
                       "Login",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                      style:
+                      TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
                 ),
                 const SizedBox(height: 30),
 
+                // Sign up link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -108,7 +136,7 @@ class logInScreen extends ConsumerWidget {
                       },
                       child: const Text(
                         "Sign up",
-                        style: TextStyle(color: Colors.red),
+                        style: TextStyle(color: Color(0xFFE91E63)),
                       ),
                     ),
                   ],

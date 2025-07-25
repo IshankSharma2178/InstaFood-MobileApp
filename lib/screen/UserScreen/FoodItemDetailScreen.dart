@@ -1,7 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:food_app/screen/UserScreen/navigatorScreen.dart';
+import 'package:food_app/server/user/isInCart.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:food_app/models/FoodItemModel.dart';
 import 'package:food_app/server/restaurant/addToCart.dart';
 import 'package:food_app/server/user/orderItem.dart';
@@ -26,6 +29,8 @@ class FoodItemDetailScreen extends StatefulWidget {
 
 class _FoodItemDetailScreenState extends State<FoodItemDetailScreen> {
   late Razorpay _razorpay;
+  bool _isAddingToCart = false;
+  bool _isInCart = false;
 
   @override
   void initState() {
@@ -34,6 +39,8 @@ class _FoodItemDetailScreenState extends State<FoodItemDetailScreen> {
       ..on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess)
       ..on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError)
       ..on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+
+    _checkCartStatus();
   }
 
   @override
@@ -42,22 +49,34 @@ class _FoodItemDetailScreenState extends State<FoodItemDetailScreen> {
     super.dispose();
   }
 
+  void _checkCartStatus() async {
+    final userId = await getUserId();
+    if (userId == null) return;
+
+    final inCart = await isInCart(userId, widget.item.id);
+    if (mounted) {
+      setState(() {
+        _isInCart = inCart;
+      });
+    }
+  }
+
   void _startPayment() {
-    final price = (widget.item.price * 100).toInt(); // convert to paise
-    final email = FirebaseAuth.instance.currentUser?.email ?? '';
-
-    var options = {
-      'key': '', // Replace with your actual Razorpay key
-      'amount': price,
-      'name': widget.item.name,
-      'description': 'Food order from InstaFood',
-      'prefill': {'contact': '', 'email': email},
-    };
-
     try {
+      final price = (widget.item.price * 100).toInt();
+      final email = FirebaseAuth.instance.currentUser?.email ?? '';
+
+      var options = {
+        'key': "rzp_test_Klke2pJ4rcNIaM",
+        'amount': price,
+        'name': FirebaseAuth.instance.currentUser?.displayName ?? 'User',
+        'description': 'Food order from InstaFood',
+        'prefill': {'contact': '', 'email': email},
+      };
+
       _razorpay.open(options);
     } catch (e) {
-      debugPrint('Payment error: $e');
+      Fluttertoast.showToast(msg: 'Could not open payment gateway.');
     }
   }
 
@@ -84,9 +103,9 @@ class _FoodItemDetailScreenState extends State<FoodItemDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Order failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Order failed: $e')),
+        );
       }
     }
   }
@@ -104,21 +123,59 @@ class _FoodItemDetailScreenState extends State<FoodItemDetailScreen> {
   }
 
   Future<void> _addToCart() async {
+    setState(() => _isAddingToCart = true);
+
     final userId = await getUserId();
-    if (userId == null) return;
-
-    await addItemToCart(
-      userId: userId,
-      item: widget.item,
-      itemId: widget.item.id,
-      categoryName: widget.categoryName,
-    );
-
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Item added to cart')));
+    if (userId == null) {
+      setState(() => _isAddingToCart = false);
+      return;
     }
+
+    try {
+      await addItemToCart(
+        userId: userId,
+        item: widget.item,
+        itemId: widget.item.id,
+        categoryName: widget.categoryName,
+      );
+
+      Fluttertoast.showToast(
+        msg: "${widget.item.name} added to cart!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.pink.shade900,
+        textColor: Colors.white,
+        fontSize: 16,
+        timeInSecForIosWeb: 1,
+        webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+      );
+
+      setState(() {
+        _isInCart = true;
+      });
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'Error adding to cart: $e');
+    } finally {
+      if (mounted) setState(() => _isAddingToCart = false);
+    }
+  }
+
+  Widget _buildInfoPill(IconData icon, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 4),
+          Text(text, style: const TextStyle(fontSize: 14, color: Colors.black)),
+        ],
+      ),
+    );
   }
 
   @override
@@ -126,38 +183,71 @@ class _FoodItemDetailScreenState extends State<FoodItemDetailScreen> {
     final item = widget.item;
 
     return Scaffold(
-      appBar: AppBar(title: Text(item.name), backgroundColor: Colors.red),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.red, Colors.orange],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.fastfood, color: Colors.white, size: 24),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      item.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (item.images.isNotEmpty)
-              SizedBox(
-                width: double.infinity,
+              ClipRRect(
                 child: CarouselSlider(
                   options: CarouselOptions(
-                    height: 300,
-                    enlargeCenterPage: false,
-                    enableInfiniteScroll: false,
-                    viewportFraction: 1.0,
+                    height: 280,
                     autoPlay: true,
+                    viewportFraction: 1.0,
                   ),
-                  items: item.images.map((imageUrl) {
-                    return Builder(
-                      builder: (BuildContext context) {
-                        return ClipRRect(
-                          child: Image.network(
-                            imageUrl,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
+                  items: item.images.map((url) {
+                    return Image.network(
+                      url,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, _) => const Icon(Icons.broken_image),
                     );
                   }).toList(),
                 ),
               ),
-
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -166,41 +256,34 @@ class _FoodItemDetailScreenState extends State<FoodItemDetailScreen> {
                   Text(
                     item.name,
                     style: const TextStyle(
-                      fontSize: 22,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     item.description,
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
+                  Text(
+                    "₹${item.price.toStringAsFixed(2)}",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.red,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "₹${item.price.toStringAsFixed(2)}",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(item.weight, style: const TextStyle(fontSize: 16)),
+                      _buildInfoPill(Icons.star, item.ratings.toStringAsFixed(1), Colors.amber),
+                      _buildInfoPill(Icons.scale, '${item.weight}', Colors.green),
+                      _buildInfoPill(Icons.timer, '32 mins', Colors.blueGrey),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber),
-                      const SizedBox(width: 6),
-                      Text(
-                        item.ratings.toStringAsFixed(1),
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   if (!item.available)
                     const Text(
                       "Currently Not Available",
@@ -217,32 +300,73 @@ class _FoodItemDetailScreenState extends State<FoodItemDetailScreen> {
       ),
       bottomNavigationBar: item.available
           ? Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  if (!widget.fromCart)
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _addToCart,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                        ),
-                        child: const Text("Add to Cart"),
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            if (!widget.fromCart)
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _isInCart
+                      ? () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MainNavigationScreen(initialIndex: 2),
                       ),
-                    ),
-                  if (!widget.fromCart) const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _startPayment,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                      ),
-                      child: const Text("Buy Now"),
+                    );
+                  }
+
+                      : (_isAddingToCart ? null : _addToCart),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isInCart ? Colors.orange : Colors.red,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                ],
+                  child: _isAddingToCart
+                      ? const SizedBox(
+                    height: 22,
+                    width: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                      : Text(
+                    _isInCart ? "Go to Cart" : "Add to Cart",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
-            )
+            if (!widget.fromCart) const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: _startPayment,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green.shade700,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: const Text(
+                  "Buy Now",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      )
           : const SizedBox.shrink(),
     );
   }

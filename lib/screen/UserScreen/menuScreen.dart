@@ -11,11 +11,48 @@ class MenuScreen extends ConsumerWidget {
     final categoryAsync = ref.watch(menuProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Menu Categories'),
-        backgroundColor: Colors.red,
-        automaticallyImplyLeading: false,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.red, Colors.orange],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.restaurant_menu, color: Colors.white, size: 24),
+                  SizedBox(width: 8),
+                  Text(
+                    'Menu',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
+
+
       body: categoryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
@@ -43,7 +80,8 @@ class MenuScreen extends ConsumerWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => CategoryItemsScreen(categoryName: name),
+                        builder: (_) =>
+                            CategoryItemsScreen(categoryName: name),
                       ),
                     );
                   },
@@ -57,7 +95,8 @@ class MenuScreen extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12)),
                             child: Image.network(
                               imageUrl,
                               fit: BoxFit.contain,

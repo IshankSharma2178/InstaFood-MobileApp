@@ -25,13 +25,32 @@ class FoodItem {
     this.categoryName,
   });
 
-  /// Parses from Firestore DocumentSnapshot (used for menu item)
+  /// Parses from Firestore DocumentSnapshot (standard menu usage)
   factory FoodItem.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return FoodItem.fromMap(data, id: doc.id);
   }
 
-  /// Generic Map constructor (used for popular item or any other source)
+  /// Constructs from Firestore document data + ID + categoryName (for search)
+  factory FoodItem.fromFirestoreWithCategory(
+      Map<String, dynamic> data, String docId, String categoryName) {
+    return FoodItem(
+      id: docId,
+      name: data['name'] ?? '',
+      description: data['description'] ?? data['Description'] ?? '',
+      images: List<String>.from(data['images'] ?? []),
+      price: _parseDouble(data['price']),
+      ratings: _parseDouble(data['ratings']),
+      weight: data['weight']?.toString() ?? '',
+      available: data['available'] is bool
+          ? data['available']
+          : (data['available'].toString().toLowerCase() == 'true'),
+      offerText: data['offerText'],
+      categoryName: categoryName,
+    );
+  }
+
+  /// Generic Map constructor (used for local/manual mapping)
   factory FoodItem.fromMap(Map<String, dynamic> map, {required String id}) {
     return FoodItem(
       id: id,
@@ -45,7 +64,7 @@ class FoodItem {
           ? map['available']
           : (map['available'].toString().toLowerCase() == 'true'),
       offerText: map['offerText'],
-      categoryName: map['categoryName'], // optional for filtering, if present
+      categoryName: map['categoryName'],
     );
   }
 

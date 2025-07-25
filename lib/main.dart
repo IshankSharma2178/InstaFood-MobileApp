@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:food_app/screen/UserScreen/navigatorScreen.dart';
 import 'package:food_app/screen/authScreen/logInScreen.dart';
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute:   '/home' ,
+      initialRoute:  FirebaseAuth.instance.currentUser == null ?  '/login' : '/home'  ,
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/login':

@@ -8,6 +8,7 @@ class CartItem {
   final String itemId;
   final String itemCategory;
   final DateTime date;
+  int quantity; // Now mutable so we can update it locally
 
   CartItem({
     required this.id,
@@ -17,6 +18,7 @@ class CartItem {
     required this.itemId,
     required this.itemCategory,
     required this.date,
+    required this.quantity,
   });
 
   factory CartItem.fromFirestore(DocumentSnapshot doc) {
@@ -29,6 +31,7 @@ class CartItem {
       itemId: data['itemId'] ?? '',
       itemCategory: data['itemCategory'] ?? '',
       date: (data['date'] as Timestamp).toDate(),
+      quantity: data['quantity'] ?? 1, // Default to 1 if not present
     );
   }
 }
